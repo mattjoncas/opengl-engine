@@ -1,23 +1,9 @@
-﻿Build started 18/01/2015 5:27:44 PM.
+﻿Build started 26/01/2015 10:58:21 AM.
      1>Project "C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Renderer\Renderer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SFML\include /I"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\src" /I"C:\Users\Matt Joncas\Desktop\glm-0.9.5.4\glm" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt GameObject.cpp Renderer.cpp WorldManager.cpp
-         Renderer.cpp
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\renderer.cpp(86): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\renderer.cpp(133): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\renderer.cpp(243): warning C4244: 'argument' : conversion from 'float' to 'GLsizeiptr', possible loss of data
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\renderer.cpp(244): warning C4244: 'argument' : conversion from 'float' to 'GLsizeiptr', possible loss of data
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\renderer.cpp(252): warning C4244: 'argument' : conversion from 'float' to 'GLsizeiptr', possible loss of data
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\renderer.cpp(253): warning C4244: 'argument' : conversion from 'float' to 'GLsizeiptr', possible loss of data
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\renderer.cpp(292): warning C4018: '<' : signed/unsigned mismatch
-         Generating Code...
-         Compiling...
-         GameObject.cpp
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\gameobject.cpp(81): warning C4244: 'argument' : conversion from 'double' to 'const float', possible loss of data
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\gameobject.cpp(95): warning C4018: '<' : signed/unsigned mismatch
-         Generating Code...
-         Skipping... (no relevant changes detected)
-         WorldManager.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SFML\include /I"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\src" /I"C:\Users\Matt Joncas\Desktop\glm-0.9.5.4\glm" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt LightManager.cpp
+         LightManager.cpp
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\lightmanager.cpp(40): warning C4018: '<' : signed/unsigned mismatch
        Lib:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Debug\Renderer.lib" "sfml-audio-d.lib" "sfml-graphics-d.lib" "sfml-network-d.lib" "sfml-window-d.lib" "sfml-system-d.lib" OpenGL32.lib glew32.lib SOIL.lib /LIBPATH:C:\SFML\lib /LIBPATH:"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\lib" /NOLOGO Debug\AABox.obj
          Debug\BoundingShape.obj
@@ -56,4 +42,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:06.47
+Time Elapsed 00:00:01.34

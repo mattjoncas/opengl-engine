@@ -39,7 +39,7 @@ namespace mor{
 		glBindBuffer(GL_UNIFORM_BUFFER, _light_ubo);
 		for (int i = 0; i < lights.size(); i++){
 			if (lights[i]->UpdateCheck()){
-				int ubo_offset = sizeof(glm::vec4) * 4 + sizeof(float) * 2;// light ubo byte size
+				int ubo_offset = sizeof(glm::vec4) * 5;// +sizeof(float)* 2;// light ubo byte size
 				ubo_offset *= i;
 				glBufferSubData(GL_UNIFORM_BUFFER, ubo_offset, sizeof(glm::vec4), glm::value_ptr(lights[i]->Position()));
 				glBufferSubData(GL_UNIFORM_BUFFER, ubo_offset + sizeof(glm::vec4) * 4, sizeof(float), &lights[i]->size);
