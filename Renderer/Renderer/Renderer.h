@@ -19,6 +19,8 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+#define SHADOWMAP_SIZE 1024
+
 namespace mor{
 	//shadow mapping stuff
 	struct CameraDirection{

@@ -3,9 +3,12 @@
 namespace mor{
 
 	GameObject::GameObject(){
-		velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-		acceleration = glm::vec3(0.0f, 0.0f, 0.0f);
-		angularVel = glm::vec3(0.0f, 0.0f, 0.0f);
+		position = glm::vec3(0.0f);
+		rotation = glm::vec3(0.0f);
+		scale = glm::vec3(1.0f);
+		velocity = glm::vec3(0.0f);
+		acceleration = glm::vec3(0.0f);
+		angularVel = glm::vec3(0.0f);
 
 		model = -1;
 		texture = -1;
@@ -13,6 +16,23 @@ namespace mor{
 		material = 0;
 
 		active = true;
+	}
+	GameObject::GameObject(glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scale, glm::vec3 _vel, glm::vec3 _accel, glm::vec3 _angVel){
+		position = _pos;
+		rotation = _rot;
+		q = glm::quat(_rot);
+		scale = _scale;
+		velocity = _vel;
+		acceleration = _accel;
+		angularVel = _angVel;
+
+		model = -1;
+		texture = -1;
+		shader = 0;
+		material = 0;
+
+		active = true;
+		CreateBoundingSphere();
 	}
 
 	GameObject::~GameObject(){
@@ -28,17 +48,21 @@ namespace mor{
 		q = glm::quat(_rot);
 		scale = _scale;
 
-		float r = scale.x;
-		if (scale.y > r){
-			r = scale.y;
+		CreateBoundingSphere();
+	}
+	void GameObject::Init(int _model, int _shader, int _texture, int _material){
+		if (_model){
+			model = _model;
 		}
-		if (scale.z > r){
-			r = scale.z;
+		if (_shader){
+			shader = _shader;
 		}
-		r /= 2;
-
-		//update sphere
-		bounding_shape = dynamic_cast<Sphere*>(new Sphere(glm::vec3(GetModelMatrix()[3][0], GetModelMatrix()[3][1], GetModelMatrix()[3][2]), r));
+		if (_texture){
+			texture = _texture;
+		}
+		if (_material){
+			material = _material;
+		}
 	}
 
 	glm::mat4x4 GameObject::GetModelMatrix(){
@@ -49,9 +73,7 @@ namespace mor{
 		
 		//rotation
 		_model *= glm::mat4_cast(q);
-		//_model = glm::rotate(_model, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		//_model = glm::rotate(_model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		//_model = glm::rotate(_model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		
 		//scale
 		_model = glm::scale(_model, scale);
 
@@ -105,10 +127,16 @@ namespace mor{
 		return children;
 	}
 
-	void GameObject::SetActive(bool _isActive){
-		active = _isActive;
-	}
-	bool GameObject::IsActive(){
-		return active;
+	void GameObject::CreateBoundingSphere(){
+		float r = scale.x;
+		if (scale.y > r){
+			r = scale.y;
+		}
+		if (scale.z > r){
+			r = scale.z;
+		}
+		r /= 2;
+		
+		bounding_shape = dynamic_cast<Sphere*>(new Sphere(glm::vec3(GetModelMatrix()[3][0], GetModelMatrix()[3][1], GetModelMatrix()[3][2]), r));
 	}
 }

@@ -7,15 +7,20 @@ namespace mor{
 	{
 	public:
 		Light();
+		//point light
 		Light(glm::vec4 _position, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular, float _size, float _drop_rate);
+		//directional light
+		Light(glm::vec4 _direction, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular);
 		~Light();
 
 		inline glm::vec4 Position() { return position; };
+		inline glm::vec4 Direction() { return direction; };
 		inline glm::vec4 Ambient() { return ambient;  };
 		inline glm::vec4 Diffuse() { return diffuse; };
 		inline glm::vec4 Specular() { return specular; };
 
 		void SetPosition(glm::vec4 _pos);
+		void SetDirection(glm::vec4 _dir);
 		void SetAmbient(glm::vec4 _amb);
 		void SetDiffuse(glm::vec4 _diff);
 		void SetSpecular(glm::vec4 _spec);
@@ -43,7 +48,7 @@ namespace mor{
 		float size, drop_off_rate;
 	private:
 
-		glm::vec4 position, ambient, diffuse, specular;
+		glm::vec4 position, direction, ambient, diffuse, specular;
 
 		bool isOn, update_ubo;
 	};

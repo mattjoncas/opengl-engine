@@ -12,8 +12,10 @@ namespace mor{
 	class GameObject {
 	public:
 		GameObject();
+		GameObject(glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scale, glm::vec3 _vel, glm::vec3 _accel, glm::vec3 _angVel);
 		~GameObject();
 		void Init(glm::vec3 _pos, glm::vec3 _rot, glm::vec3 _scale);
+		void Init(int _model, int _shader, int _texture, int _material);
 
 		glm::vec3 position;
 		glm::quat q;
@@ -25,6 +27,19 @@ namespace mor{
 		glm::vec3 angularVel;
 
 		virtual void Update(float _delta);
+		
+		inline bool IsActive(){
+			return active;
+		}
+		inline void SetActive(bool _isActive){
+			active = _isActive;
+		}
+		inline void SetRotation(glm::quat _q){
+			q = _q;
+		}
+		inline void SetRotation(glm::vec3 _rot){
+			q = glm::quat(_rot);
+		}
 
 		int texture, shader, model, material;
 
@@ -34,14 +49,14 @@ namespace mor{
 		std::vector<GameObject*> GetChildren();
 
 		BoundingShape *bounding_shape;
-
-		void SetActive(bool _isActive);
-		bool IsActive();
+		
 	private:
 		GameObject* parent;
 		std::vector<GameObject*> children;
 
 		bool active;
+
+		void CreateBoundingSphere();
 	};
 
 }

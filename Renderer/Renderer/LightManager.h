@@ -27,6 +27,7 @@ namespace mor{
 		int LightCount();
 
 		glm::vec3 GetLightPosition(int _index);
+		bool IsLightActive(int _index);
 	};
 
 }

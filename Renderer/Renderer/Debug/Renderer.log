@@ -1,11 +1,12 @@
-﻿Build started 26/01/2015 10:58:21 AM.
-     1>Project "C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Renderer\Renderer.vcxproj" on node 2 (Build target(s)).
+﻿Build started 02/02/2015 8:10:27 PM.
+     1>Project "C:\Users\Matt Joncas\documents\visual studio 2013\Projects\Renderer\Renderer\Renderer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SFML\include /I"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\src" /I"C:\Users\Matt Joncas\Desktop\glm-0.9.5.4\glm" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt LightManager.cpp
-         LightManager.cpp
-     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\lightmanager.cpp(40): warning C4018: '<' : signed/unsigned mismatch
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SFML\include /I"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\src" /I"C:\Users\Matt Joncas\Desktop\glm-0.9.5.4\glm" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt GameObject.cpp
+         GameObject.cpp
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\gameobject.cpp(103): warning C4244: 'argument' : conversion from 'double' to 'const float', possible loss of data
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\gameobject.cpp(117): warning C4018: '<' : signed/unsigned mismatch
        Lib:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Debug\Renderer.lib" "sfml-audio-d.lib" "sfml-graphics-d.lib" "sfml-network-d.lib" "sfml-window-d.lib" "sfml-system-d.lib" OpenGL32.lib glew32.lib SOIL.lib /LIBPATH:C:\SFML\lib /LIBPATH:"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\lib" /NOLOGO Debug\AABox.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\Matt Joncas\documents\visual studio 2013\Projects\Renderer\Debug\Renderer.lib" "sfml-audio-d.lib" "sfml-graphics-d.lib" "sfml-network-d.lib" "sfml-window-d.lib" "sfml-system-d.lib" OpenGL32.lib glew32.lib SOIL.lib /LIBPATH:C:\SFML\lib /LIBPATH:"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\lib" /NOLOGO Debug\AABox.obj
          Debug\BoundingShape.obj
          Debug\Camera.obj
          Debug\GameObject.obj
@@ -37,9 +38,9 @@
      1>OpenGL32.lib(OPENGL32.dll) : warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
      1>glew32.lib(glew32.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in sfml-audio-d.lib(sfml-audio-d-2.dll); second definition ignored
      1>glew32.lib(glew32.dll) : warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
-         Renderer.vcxproj -> C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Debug\Renderer.lib
-     1>Done Building Project "C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Renderer\Renderer.vcxproj" (Build target(s)).
+         Renderer.vcxproj -> C:\Users\Matt Joncas\documents\visual studio 2013\Projects\Renderer\Debug\Renderer.lib
+     1>Done Building Project "C:\Users\Matt Joncas\documents\visual studio 2013\Projects\Renderer\Renderer\Renderer.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.34
+Time Elapsed 00:00:01.38

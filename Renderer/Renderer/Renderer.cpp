@@ -44,7 +44,7 @@ namespace mor{
 		matManager.AddMaterial(glm::vec4(1.0, 1.0, 1.0, 1.0), glm::vec4(0.8, 0.8, 0.8, 1.0), glm::vec4(0.5, 0.5, 0.5, 1.0), 25.0f);
 		
 		shadowMapFBO = new ShadowMapFBO();
-		shadowMapFBO->Init(1024, 1024);
+		shadowMapFBO->Init(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
 		gCameraDirections[0] = { GL_TEXTURE_CUBE_MAP_POSITIVE_X, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f) };
 		gCameraDirections[1] = { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f) };
 		gCameraDirections[2] = { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f) };
@@ -59,25 +59,20 @@ namespace mor{
 	}
 
 	void Renderer::Render(GameObject* _object){
-		if (camera->InFrustum(_object->GetModelMatrix())){
-			sManager.BindShader(_object->shader);
-			mManager.BindModel(_object->model);
-			tManager.BindTexture(_object->texture);
-			//update shader model uniform
-			glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_object->GetModelMatrix()));
-			glUniformMatrix3fv(sManager.GetNormalUniformL(), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(_object->GetModelMatrix())))));
+		if (_object->IsActive()){
+			glm::mat4x4 _modelMatrix = _object->GetModelMatrix();
+			_object->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
+			if (camera->InFrustum(_object->GetModelMatrix())){
+				matManager.BindMaterial(_object->material, material_ubo);
+				sManager.BindShader(_object->shader);
+				mManager.BindModel(_object->model);
+				tManager.BindTexture(_object->texture);
+				//update shader model uniform
+				glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_object->GetModelMatrix()));
+				glUniformMatrix3fv(sManager.GetNormalUniformL(), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(_object->GetModelMatrix())))));
 
-			glDrawElements(GL_TRIANGLES, mManager.GetCount(_object->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
-			/*
-			//render object using ebo
-			std::vector<int> c = mManager.GetVertCount(_object->model);
-			int done = 0;
-			int face = 0;
-			while (done < mManager.GetCount(_object->model)){
-				glDrawElements(GL_TRIANGLE_FAN, c[face], GL_UNSIGNED_INT, (void*)(done * sizeof(GLuint)));
-				done += c[face];
-				face++;
-			}*/
+				glDrawElements(GL_TRIANGLES, mManager.GetCount(_object->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
+			}
 		}
 	}
 	void Renderer::Render(std::vector<GameObject*> _objects){
@@ -237,7 +232,7 @@ namespace mor{
 
 		glBindBuffer(GL_UNIFORM_BUFFER, lighting_ubo);
 
-		float ubo_size = sizeof(glm::vec4) * 4 + sizeof(float) * 2; //light ubo byte size
+		float ubo_size = sizeof(glm::vec4) * 5 + sizeof(float) * 2; //light ubo byte size
 		ubo_size *= MAX_LIGHTS;
 
 		glBufferData(GL_UNIFORM_BUFFER, ubo_size, NULL, GL_STREAM_DRAW);
@@ -261,76 +256,77 @@ namespace mor{
 	//shadow methods
 	void Renderer::ShadowMapPass(std::vector<GameObject*> _objects){
 		if (lManager.LightCount() > 0){
-			glBindVertexArray(vao);
-			int shadow_map_size = 1024;
+			if (lManager.IsLightActive(0)){ //hard coded for single light only right now
+				glBindVertexArray(vao);
 
-			sManager.BindShader(2);
-			//save camera state
-			glm::vec3 cam_pos = camera->pos;
-			glm::vec3 cam_dir = camera->dir;
-			glm::vec3 cam_up = camera->up;
+				sManager.BindShader(2);
+				//save camera state
+				glm::vec3 cam_pos = camera->pos;
+				glm::vec3 cam_dir = camera->dir;
+				glm::vec3 cam_up = camera->up;
 
-			camera->SetPosition(lManager.GetLightPosition(0)); //hard coded light position for testing
-			camera->fov = 90.0f;
-			camera->SetScreenSize(shadow_map_size, shadow_map_size);
-			glViewport(0, 0, shadow_map_size, shadow_map_size);
+				camera->SetPosition(lManager.GetLightPosition(0));
+				camera->fov = 90.0f;
+				camera->SetScreenSize(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+				glViewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
 
-			glCullFace(GL_FRONT);
+				glCullFace(GL_FRONT);
 
-			for (int i = 0; i < 6; i++){
-				shadowMapFBO->BindForWriting(gCameraDirections[i].CubemapFace);
+				for (int i = 0; i < 6; i++){
+					shadowMapFBO->BindForWriting(gCameraDirections[i].CubemapFace);
 
-				glClear(GL_DEPTH_BUFFER_BIT);
+					glClear(GL_DEPTH_BUFFER_BIT);
 
-				camera->dir = gCameraDirections[i].target;
-				camera->up = gCameraDirections[i].up;
+					camera->dir = gCameraDirections[i].target;
+					camera->up = gCameraDirections[i].up;
+
+					SetCamera(camera);
+					camera->UpdateFrustum();
+
+					//render each object
+					for (int i = 0; i < _objects.size(); i++){
+						if (_objects[i]->IsActive()){
+							glm::mat4x4 _modelMatrix = _objects[i]->GetModelMatrix();
+							//update sphere with parent rot/pos
+							_objects[i]->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
+							if (camera->InFrustum(_objects[i]->bounding_shape)){
+
+								mManager.BindModel(_objects[i]->model);
+
+								glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_modelMatrix));
+
+								glDrawElements(GL_TRIANGLES, mManager.GetCount(_objects[i]->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
+
+							}
+							/*
+							//render every child object
+							for (int c = 0; c < _objects[i]->GetChildren().size(); c++){
+							Render(_objects[i]->GetChildren());
+							}
+							*/
+						}
+					}
+				}
+				//reset everything
+				sManager.BindShader(-1);
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+				camera->SetPosition(cam_pos);
+				camera->dir = cam_dir;
+				camera->up = cam_up;
+				camera->fov = 45.0f;
+				camera->SetScreenSize(800, 600);
+				glViewport(0, 0, 800, 600);
 
 				SetCamera(camera);
 				camera->UpdateFrustum();
 
-				//render each object
-				for (int i = 0; i < _objects.size(); i++){
-					if (_objects[i]->IsActive()){
-						glm::mat4x4 _modelMatrix = _objects[i]->GetModelMatrix();
-						//update sphere with parent rot/pos
-						_objects[i]->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
-						if (camera->InFrustum(_objects[i]->bounding_shape)){
+				glCullFace(GL_BACK);
 
-							mManager.BindModel(_objects[i]->model);
+				shadowMapFBO->BindForReading(GL_TEXTURE1);
 
-							glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_modelMatrix));
-
-							glDrawElements(GL_TRIANGLES, mManager.GetCount(_objects[i]->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
-
-						}
-						/*
-						//render every child object
-						for (int c = 0; c < _objects[i]->GetChildren().size(); c++){
-						Render(_objects[i]->GetChildren());
-						}
-						*/
-					}
-				}
+				glActiveTexture(GL_TEXTURE0);
 			}
-			//reset everything
-			sManager.BindShader(-1);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			camera->SetPosition(cam_pos);
-			camera->dir = cam_dir;
-			camera->up = cam_up;
-			camera->fov = 45.0f;
-			camera->SetScreenSize(800, 600);
-			glViewport(0, 0, 800, 600);
-
-			SetCamera(camera);
-			camera->UpdateFrustum();
-
-			glCullFace(GL_BACK);
-
-			shadowMapFBO->BindForReading(GL_TEXTURE1);
-
-			glActiveTexture(GL_TEXTURE0);
 		}
 	}
 }
