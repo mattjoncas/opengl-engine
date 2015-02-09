@@ -59,6 +59,7 @@ namespace mor{
 	}
 
 	void Renderer::Render(GameObject* _object){
+		glBindVertexArray(vao);
 		if (_object->IsActive()){
 			glm::mat4x4 _modelMatrix = _object->GetModelMatrix();
 			_object->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
