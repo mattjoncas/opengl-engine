@@ -30,6 +30,7 @@ namespace mor{
 
 	Renderer::Renderer(){
 		debug = false;
+
 		InitVAO();
 		InitUBO();
 		//load a default shader
@@ -316,8 +317,8 @@ namespace mor{
 				camera->dir = cam_dir;
 				camera->up = cam_up;
 				camera->fov = 45.0f;
-				camera->SetScreenSize(800, 600);
-				glViewport(0, 0, 800, 600);
+				camera->SetScreenSize(screen_width, screen_height);
+				glViewport(0, 0, screen_width, screen_height);
 
 				SetCamera(camera);
 				camera->UpdateFrustum();

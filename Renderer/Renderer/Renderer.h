@@ -16,9 +16,6 @@
 
 #include "ShadowMapFBO.h"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
-
 #define SHADOWMAP_SIZE 1024
 
 namespace mor{
@@ -33,7 +30,16 @@ namespace mor{
 	class Renderer{
 	public:
 		Renderer();
+		Renderer(int _screenWidth, int _screenHeight);
 		~Renderer();
+		/*Sets the size of the view.
+		Must be set before rendering.*/
+		inline void SetScreenSize(int _screenWidth, int _screenHeight){
+			screen_width = _screenWidth;
+			screen_height = _screenHeight;
+		}
+		inline int ScreenWidth(){ return screen_width; };
+		inline int ScreenHeight(){ return screen_height; };
 
 		int LoadModel(std::string _name);
 		int LoadShader(std::string vertex_path, std::string fragment_path);
@@ -57,6 +63,8 @@ namespace mor{
 		void ShadowMapPass(std::vector<GameObject*> _objects);
 	private:
 		bool debug;
+
+		int screen_width, screen_height;
 
 		void InitVAO();
 		void InitUBO();

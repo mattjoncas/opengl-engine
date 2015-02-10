@@ -21,6 +21,8 @@ namespace mor{
 	public:
 		WorldManager();
 		~WorldManager();
+		//must set window size before rendering / loading
+		void SetWindowSize(int sWidth, int sHeight);
 
 		//static WorldManager& GetInstance();
 		bool IsRunning();

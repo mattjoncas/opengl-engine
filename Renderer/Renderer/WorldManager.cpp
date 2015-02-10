@@ -19,6 +19,9 @@ namespace mor{
 		}
 		return *instance;
 	}*/
+	void WorldManager::SetWindowSize(int sWidth, int sHeight){
+		renderer.SetScreenSize(sWidth, sHeight);
+	}
 	bool WorldManager::IsRunning(){
 		return isRunning;
 	}
