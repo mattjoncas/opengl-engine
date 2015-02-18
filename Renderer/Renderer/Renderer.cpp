@@ -75,6 +75,7 @@ namespace mor{
 
 				glDrawElements(GL_TRIANGLES, mManager.GetCount(_object->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
 			}
+			Render(_object->GetChildren());
 		}
 	}
 	void Renderer::Render(std::vector<GameObject*> _objects){
@@ -126,10 +127,7 @@ namespace mor{
 						glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 					}
 				}
-				//render every child object
-				for (int c = 0; c < _objects[i]->GetChildren().size(); c++){
-					Render(_objects[i]->GetChildren());
-				}
+				Render(_objects[i]->GetChildren());
 			}
 		}
 	}

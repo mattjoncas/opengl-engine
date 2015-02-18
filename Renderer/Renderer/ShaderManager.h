@@ -1,7 +1,6 @@
 #pragma 
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <vector>
 #include <gl/glew.h>
 #include <SFML/OpenGL.hpp>

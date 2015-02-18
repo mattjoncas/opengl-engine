@@ -24,29 +24,46 @@ namespace mor{
 			std::vector<GLfloat> _v;
 			std::vector<GLuint> _e;
 
-			std::string vfile = "_vbo.ply";
-			std::string efile = "_ebo.ply";
-
 			std::string file_path = "models/";
 
-			std::string f = file_path + _model + vfile;
+			file_path += _model + ".ply";
+			
+			std::ifstream model_input;
+			model_input.open(file_path.c_str());
+			std::string data;
+			int v_count = 0;
+
+			bool _header = true;
+			while (_header){
+				model_input >> data;
+				
+				if (data == "element"){
+					model_input >> data;
+					if (data == "vertex"){
+						model_input >> v_count;
+					}
+				}
+				if (data == "end_header"){
+					_header = false;
+				}
+			}
 
 			float a;
 			//load vbo
-			std::fstream vbo(f.c_str(), std::ios_base::in);
-
-			while (vbo >> a){
+			int c = 0;
+			while (v_count > 0){
+				model_input >> a;
+				c++;
+				if (c == 9 || c == 10 || c == 11){ a /= 255; }
+				if (c == 11){ c = 0; v_count--; }
 				_v.push_back(a);
 			}
-			_v.push_back(a);
-
-			f = file_path + _model + efile;
+			_v.push_back(a); //not sure why i need this << [last vertex loses its color if not]
 
 			//load ebo
-			std::fstream ebo(f.c_str(), std::ios_base::in);
-			int c = 0;
+			c = 0;
 			std::vector<int> _vert_count;
-			while (ebo >> a){
+			while (model_input >> a){
 				if (c == 0){
 					_vert_count.push_back(a);
 					c = a;

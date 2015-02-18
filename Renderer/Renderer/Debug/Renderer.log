@@ -1,8 +1,14 @@
-﻿Build started 09/02/2015 11:50:38 PM.
+﻿Build started 17/02/2015 10:33:47 PM.
      1>Project "C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Renderer\Renderer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SFML\include /I"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\src" /I"C:\Users\Matt Joncas\Desktop\glm-0.9.5.4\glm" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Ray.cpp
-         Ray.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SFML\include /I"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\src" /I"C:\Users\Matt Joncas\Desktop\glm-0.9.5.4\glm" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ModelManager.cpp
+         ModelManager.cpp
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\modelmanager.cpp(68): warning C4244: 'argument' : conversion from 'float' to 'const int', possible loss of data
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\modelmanager.cpp(69): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\modelmanager.cpp(72): warning C4244: 'argument' : conversion from 'float' to 'const unsigned int', possible loss of data
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\modelmanager.cpp(92): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\modelmanager.cpp(109): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\matt joncas\documents\visual studio 2013\projects\renderer\renderer\modelmanager.cpp(119): warning C4018: '<' : signed/unsigned mismatch
        Lib:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\Matt Joncas\Documents\Visual Studio 2013\Projects\Renderer\Debug\Renderer.lib" "sfml-audio-d.lib" "sfml-graphics-d.lib" "sfml-network-d.lib" "sfml-window-d.lib" "sfml-system-d.lib" OpenGL32.lib glew32.lib SOIL.lib /LIBPATH:C:\SFML\lib /LIBPATH:"C:\Users\Matt Joncas\Desktop\soil\Simple OpenGL Image Library\lib" /NOLOGO Debug\AABox.obj
          Debug\BoundingShape.obj
@@ -41,4 +47,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.93
+Time Elapsed 00:00:01.50
