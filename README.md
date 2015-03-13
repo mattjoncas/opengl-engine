@@ -1,2 +1,2 @@
-# renderer
-OpenGL Renderer
+# renderer [WIP]
+OpenGL Renderer / Game Engine. 
