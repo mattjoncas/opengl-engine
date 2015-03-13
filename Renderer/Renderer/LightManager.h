@@ -28,6 +28,7 @@ namespace mor{
 
 		glm::vec3 GetLightPosition(int _index);
 		bool IsLightActive(int _index);
+		bool CastsShadows(int _index);
 	};
 
 }

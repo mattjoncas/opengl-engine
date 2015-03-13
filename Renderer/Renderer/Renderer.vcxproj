@@ -84,6 +84,7 @@
     <ClCompile Include="AABox.cpp" />
     <ClCompile Include="BoundingShape.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CubeMapFBO.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightManager.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="AABox.h" />
     <ClInclude Include="BoundingShape.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubeMapFBO.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightManager.h" />

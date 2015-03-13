@@ -15,8 +15,9 @@
 #include "GameObject.h"
 
 #include "ShadowMapFBO.h"
+#include "CubeMapFBO.h"
 
-#define SHADOWMAP_SIZE 1024
+#define SHADOWMAP_SIZE 2048
 
 namespace mor{
 	//shadow mapping stuff
@@ -61,6 +62,7 @@ namespace mor{
 
 		//public for testing
 		void ShadowMapPass(std::vector<GameObject*> _objects);
+		void CubeMapPass(GameObject* reflect_object, std::vector<GameObject*> _objects);
 	private:
 		bool debug;
 
@@ -68,6 +70,8 @@ namespace mor{
 
 		void InitVAO();
 		void InitUBO();
+
+		void BindObject(GameObject *_object);
 
 		//vertex array object
 		GLuint vao;
@@ -86,6 +90,7 @@ namespace mor{
 
 		//more shadow stuff
 		ShadowMapFBO *shadowMapFBO;
+		CubeMapFBO *cubeMapFBO;
 
 		CameraDirection gCameraDirections[6];
 	};

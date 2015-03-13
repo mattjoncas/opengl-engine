@@ -14,6 +14,7 @@ namespace mor{
 		texture = -1;
 		shader = 0;
 		material = 0;
+		normal_map = -1;
 
 		active = true;
 	}
@@ -30,6 +31,7 @@ namespace mor{
 		texture = -1;
 		shader = 0;
 		material = 0;
+		normal_map = -1;
 
 		active = true;
 		CreateBoundingSphere();
@@ -125,6 +127,9 @@ namespace mor{
 	}
 	std::vector<GameObject*> GameObject::GetChildren(){
 		return children;
+	}
+	GameObject* GameObject::GetChild(int _index){
+		return children[_index];
 	}
 
 	void GameObject::CreateBoundingSphere(){

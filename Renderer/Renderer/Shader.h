@@ -12,13 +12,15 @@ namespace mor{
 		Shader();
 		~Shader();
 		//init shader, pass in a loaded program
-		void Init(GLuint _program);
+		void Init(GLuint _program, std::string _name);
 		//returns program
 		GLuint GetProgram();
 
 		GLuint uniModel, uniNormal, uniNumLights;
 
 		void Enable();
+
+		std::string name;
 	private:
 		GLuint posAttrib, norAttrib, colAttrib, texAttrib;
 

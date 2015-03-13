@@ -67,6 +67,12 @@ namespace mor{
 	glm::vec3 LightManager::GetLightPosition(int _index){
 		return glm::vec3(lights[_index]->Position());
 	}
+	bool LightManager::CastsShadows(int _index){
+		if (lights[_index]->Position().w == 1.0f){
+			return true;
+		}
+		return false;
+	}
 	bool LightManager::IsLightActive(int _index){
 		return lights[_index]->IsOn();
 	}

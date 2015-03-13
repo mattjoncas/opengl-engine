@@ -34,10 +34,10 @@ namespace mor{
 		InitVAO();
 		InitUBO();
 		//load a default shader
-		LoadShader("shaders/default_vert.glsl", "shaders/default_frag.glsl");
+		LoadShader("default_vert.glsl", "default_frag.glsl");
 		//wireframe shader
-		LoadShader("shaders/red_vert.glsl", "shaders/red_frag.glsl");
-		LoadShader("shaders/shadow_map_vert.glsl", "shaders/shadow_map_frag.glsl");
+		LoadShader("red_vert.glsl", "red_frag.glsl");
+		LoadShader("shadow_map_vert.glsl", "shadow_map_frag.glsl");
 		//bounding sphere load
 		LoadModel("bounding_sphere");
 		LoadModel("cube");
@@ -52,11 +52,15 @@ namespace mor{
 		gCameraDirections[3] = { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
 		gCameraDirections[4] = { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f) };
 		gCameraDirections[5] = { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f) };
+
+		cubeMapFBO = new CubeMapFBO();
+		cubeMapFBO->Init(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
 	}
 
 	Renderer::~Renderer(){
 		glDeleteVertexArrays(1, &vao);
 		delete(shadowMapFBO);
+		delete(cubeMapFBO);
 	}
 
 	void Renderer::Render(GameObject* _object){
@@ -65,10 +69,7 @@ namespace mor{
 			glm::mat4x4 _modelMatrix = _object->GetModelMatrix();
 			_object->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
 			if (camera->InFrustum(_object->GetModelMatrix())){
-				matManager.BindMaterial(_object->material, material_ubo);
-				sManager.BindShader(_object->shader);
-				mManager.BindModel(_object->model);
-				tManager.BindTexture(_object->texture);
+				BindObject(_object);
 				//update shader model uniform
 				glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_object->GetModelMatrix()));
 				glUniformMatrix3fv(sManager.GetNormalUniformL(), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(_object->GetModelMatrix())))));
@@ -87,12 +88,7 @@ namespace mor{
 				//update sphere with parent rot/pos
 				_objects[i]->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
 				if (camera->InFrustum(_objects[i]->bounding_shape)){
-					//update material&light
-					matManager.BindMaterial(_objects[i]->material, material_ubo);
-
-					sManager.BindShader(_objects[i]->shader);
-					mManager.BindModel(_objects[i]->model);
-					tManager.BindTexture(_objects[i]->texture);
+					BindObject(_objects[i]);
 					glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_modelMatrix));
 					glUniformMatrix3fv(sManager.GetNormalUniformL(), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(_modelMatrix)))));
 					//draw with only triangles
@@ -199,6 +195,15 @@ namespace mor{
 
 		return _index;
 	}
+	void Renderer::BindObject(GameObject *_object){
+		matManager.BindMaterial(_object->material, material_ubo);
+		sManager.BindShader(_object->shader);
+		mManager.BindModel(_object->model);
+		tManager.BindTexture(_object->texture, GL_TEXTURE0);
+		if (_object->normal_map != -1){
+			tManager.BindTexture(_object->normal_map, GL_TEXTURE1);
+		}
+	}
 	void Renderer::BindShader(int _index){
 		sManager.BindShader(_index);
 	}
@@ -256,7 +261,7 @@ namespace mor{
 	//shadow methods
 	void Renderer::ShadowMapPass(std::vector<GameObject*> _objects){
 		if (lManager.LightCount() > 0){
-			if (lManager.IsLightActive(0)){ //hard coded for single light only right now
+			if (lManager.IsLightActive(0) && lManager.CastsShadows(0)){ //hard coded for single light only right now
 				glBindVertexArray(vao);
 
 				sManager.BindShader(2);
@@ -292,9 +297,7 @@ namespace mor{
 							if (camera->InFrustum(_objects[i]->bounding_shape)){
 
 								mManager.BindModel(_objects[i]->model);
-
 								glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_modelMatrix));
-
 								glDrawElements(GL_TRIANGLES, mManager.GetCount(_objects[i]->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
 
 							}
@@ -323,10 +326,75 @@ namespace mor{
 
 				glCullFace(GL_BACK);
 
-				shadowMapFBO->BindForReading(GL_TEXTURE1);
+				shadowMapFBO->BindForReading(GL_TEXTURE2);
 
 				glActiveTexture(GL_TEXTURE0);
 			}
 		}
+	}
+	void Renderer::CubeMapPass(GameObject* reflect_object, std::vector<GameObject*> _objects){
+		glBindVertexArray(vao);
+		
+		//save camera state
+		glm::vec3 cam_pos = camera->pos;
+		glm::vec3 cam_dir = camera->dir;
+		glm::vec3 cam_up = camera->up;
+
+		camera->SetPosition(reflect_object->position);
+		camera->fov = 90.0f;
+		camera->SetScreenSize(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+		glViewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+
+		for (int i = 0; i < 6; i++){
+			cubeMapFBO->BindForWriting(gCameraDirections[i].CubemapFace);
+			
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			camera->dir = gCameraDirections[i].target;
+			camera->up = gCameraDirections[i].up;
+
+			SetCamera(camera);
+			camera->UpdateFrustum();
+
+			//render each object
+			for (int i = 0; i < _objects.size(); i++){
+				if (_objects[i]->IsActive() && _objects[i] != reflect_object){
+					glm::mat4x4 _modelMatrix = _objects[i]->GetModelMatrix();
+					//update sphere with parent rot/pos
+					_objects[i]->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
+					if (camera->InFrustum(_objects[i]->bounding_shape)){
+
+						BindObject(_objects[i]);
+						glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_modelMatrix));
+						glUniformMatrix3fv(sManager.GetNormalUniformL(), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(_modelMatrix)))));
+						glDrawElements(GL_TRIANGLES, mManager.GetCount(_objects[i]->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
+
+					}
+					/*
+					//render every child object
+					for (int c = 0; c < _objects[i]->GetChildren().size(); c++){
+					Render(_objects[i]->GetChildren());
+					}
+					*/
+				}
+			}
+		}
+		//reset everything
+		sManager.BindShader(-1);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		camera->SetPosition(cam_pos);
+		camera->dir = cam_dir;
+		camera->up = cam_up;
+		camera->fov = 45.0f;
+		camera->SetScreenSize(screen_width, screen_height);
+		glViewport(0, 0, screen_width, screen_height);
+
+		SetCamera(camera);
+		camera->UpdateFrustum();
+
+		cubeMapFBO->BindForReading(GL_TEXTURE3);
+
+		glActiveTexture(GL_TEXTURE0);
 	}
 }

@@ -17,4 +17,3 @@ public:
 private:
 	GLuint fbo, shadowMap;
 };
-

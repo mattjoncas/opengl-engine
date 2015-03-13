@@ -5,7 +5,7 @@ namespace mor{
 	TextureManager* TextureManager::instance = nullptr;
 
 	TextureManager::TextureManager(){
-
+		current_texture = -1;
 	}
 
 	TextureManager::~TextureManager(){
@@ -19,18 +19,39 @@ namespace mor{
 		return *instance;
 	}
 
-	void TextureManager::BindTexture(int _index){
-		if (_index != current){
-			if (_index == -1){
-				glBindTexture(GL_TEXTURE_2D, 0);
-				current = _index;
+	void TextureManager::BindTexture(int _index, GLenum _textureUnit){
+		//texture
+		if (_textureUnit == GL_TEXTURE0){
+			if (_index != current_texture){
+				glActiveTexture(_textureUnit);
+				if (_index == -1){
+					glBindTexture(GL_TEXTURE_2D, 0);
+					current_texture = _index;
+				}
+				else if (_index < textures.size()){
+					glBindTexture(GL_TEXTURE_2D, textures[_index].texture);
+					current_texture = _index;
+				}
+				else{
+					std::cout << "Texture index out of range.\n";
+				}
 			}
-			else if (_index < textures.size()){
-				glBindTexture(GL_TEXTURE_2D, textures[_index].texture);
-				current = _index;
-			}
-			else{
-				std::cout << "Texture index out of range.";
+		}
+		//normal map
+		else if (_textureUnit == GL_TEXTURE1){
+			if (_index != current_normalmap){
+				glActiveTexture(_textureUnit);
+				if (_index == -1){
+					glBindTexture(GL_TEXTURE_2D, 0);
+					current_normalmap = _index;
+				}
+				else if (_index < textures.size()){
+					glBindTexture(GL_TEXTURE_2D, textures[_index].texture);
+					current_normalmap = _index;
+				}
+				else{
+					std::cout << "Texture index out of range. [normal map]\n";
+				}
 			}
 		}
 	}

@@ -41,12 +41,14 @@ namespace mor{
 			q = glm::quat(_rot);
 		}
 
-		int texture, shader, model, material;
+		int texture, shader, model, material, normal_map;
 
 		glm::mat4x4 GetModelMatrix();
 
 		void AddChild(GameObject* _child);
 		std::vector<GameObject*> GetChildren();
+		//get child object at index
+		GameObject* GetChild(int _index);
 
 		BoundingShape *bounding_shape;
 		

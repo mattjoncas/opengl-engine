@@ -39,6 +39,8 @@ namespace mor{
 
 		//made public for shadow testing
 		float fov, fnear, ffar;
+
+		void Lerp(glm::vec3 target_position, float _lerp_time);
 	private:
 		int sWidth, sHeight;
 		
@@ -52,6 +54,10 @@ namespace mor{
 		bool InFrustum(AABox *_box);
 
 		bool fps;
+
+		bool lerping = false;
+		glm::vec3 lerp_start, lerp_end;
+		float lerp_time, lerp_end_time;
 	};
 
 }

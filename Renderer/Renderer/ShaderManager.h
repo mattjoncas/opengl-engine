@@ -16,11 +16,14 @@ namespace mor{
 		ShaderManager();
 		std::string ReadFile(const char *filePath);
 		int current;
+
+		bool IsLoaded(std::string _name);
 	public:
 		~ShaderManager();
 
 		static ShaderManager& GetInstance();
-		int LoadShader(const char *vertex_path, const char *fragment_path);
+		//loads a glsl shader from within the 'shaders' folder
+		int LoadShader(const char *vertex_name, const char *fragment_name);
 		void BindShader(int _index);
 		GLuint GetBindedProgram();
 
@@ -29,6 +32,7 @@ namespace mor{
 		GLuint GetNumLightsUniform();
 
 		int ShaderCount();
+		int GetShaderIndex(std::string _name);
 	};
 
 }

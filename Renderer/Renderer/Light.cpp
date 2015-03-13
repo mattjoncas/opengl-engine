@@ -4,8 +4,9 @@ namespace mor{
 	Light::Light(){
 
 	}
-	Light::Light(glm::vec4 _position, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular, float _size, float _drop_off){
-		position = _position;
+	Light::Light(glm::vec3 _position, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular, float _size, float _drop_off, bool cast_shadows){
+		if (!cast_shadows){ position = glm::vec4(_position, 0.0f); }
+		else{ position = glm::vec4(_position, 1.0f); }
 		direction = glm::vec4(0.0f);
 		ambient = _ambient;
 		diffuse = _diffuse;
@@ -16,9 +17,9 @@ namespace mor{
 		isOn = true;
 		update_ubo = true;
 	}
-	Light::Light(glm::vec4 _direction, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular){
+	Light::Light(glm::vec3 _direction, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular){
 		position = glm::vec4(0.0f);
-		direction = _direction;
+		direction = glm::vec4(_direction, 0.0f);
 		ambient = _ambient;
 		diffuse = _diffuse;
 		specular = _specular;

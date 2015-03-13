@@ -100,6 +100,17 @@ namespace mor{
 				sf::Mouse::setPosition(sf::Vector2i(sWidth / 2, sHeight / 2));
 			}
 		}
+		if (lerping){
+			lerp_time += _delta;
+			if (lerp_time >= lerp_end_time){
+				pos = lerp_end;
+				lerping = false;
+			}
+			else{
+				float c_time = lerp_time / lerp_end_time;
+				pos = lerp_start + c_time * (lerp_end - lerp_start);
+			}
+		}
 		
 		UpdateFrustum();
 	}
@@ -209,5 +220,12 @@ namespace mor{
 		t = glm::normalize(t);
 		top.SetNormal(glm::cross(t, glm::cross(dir, up)));
 		top.SetD(glm::dot(top.Normal(), pos));
+	}
+	void Camera::Lerp(glm::vec3 target_position, float _lerp_time){
+		lerping = true;
+		lerp_start = pos;
+		lerp_end = target_position;
+		lerp_time = 0.0f;
+		lerp_end_time = _lerp_time;
 	}
 }

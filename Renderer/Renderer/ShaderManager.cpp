@@ -49,66 +49,77 @@ namespace mor{
 	}
 
 	//compile shader [combines vertex & fragment shaders into one GLuint]
-	int ShaderManager::LoadShader(const char *vertex_path, const char *fragment_path){
-		GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
-		GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	int ShaderManager::LoadShader(const char *vertex_name, const char *fragment_name){
+		if (!IsLoaded(vertex_name)){
+			std::string v_path = "shaders/";
+			v_path.append(vertex_name);
+			std::string f_path = "shaders/";
+			f_path.append(fragment_name);
 
-		// Read shaders
-		std::string vertShaderStr = ReadFile(vertex_path);
-		std::string fragShaderStr = ReadFile(fragment_path);
-		const char *vertShaderSrc = vertShaderStr.c_str();
-		const char *fragShaderSrc = fragShaderStr.c_str();
+			GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+			GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-		GLint result = GL_FALSE;
-		int logLength;
+			// Read shaders
+			std::string vertShaderStr = ReadFile(v_path.c_str());
+			std::string fragShaderStr = ReadFile(f_path.c_str());
+			const char *vertShaderSrc = vertShaderStr.c_str();
+			const char *fragShaderSrc = fragShaderStr.c_str();
 
-		// Compile vertex shader
-		std::cout << "Compiling vertex shader.\n";
-		glShaderSource(vertShader, 1, &vertShaderSrc, NULL);
-		glCompileShader(vertShader);
+			GLint result = GL_FALSE;
+			int logLength;
 
-		// Check vertex shader
-		glGetShaderiv(vertShader, GL_COMPILE_STATUS, &result);
-		glGetShaderiv(vertShader, GL_INFO_LOG_LENGTH, &logLength);
-		std::vector<char> vertShaderError((logLength > 1) ? logLength : 1);
-		glGetShaderInfoLog(vertShader, logLength, NULL, &vertShaderError[0]);
-		std::cout << &vertShaderError[0] << "\n";
+			// Compile vertex shader
+			std::cout << "Compiling vertex shader.\n";
+			glShaderSource(vertShader, 1, &vertShaderSrc, NULL);
+			glCompileShader(vertShader);
 
-		// Compile fragment shader
-		std::cout << "Compiling fragment shader.\n";
-		glShaderSource(fragShader, 1, &fragShaderSrc, NULL);
-		glCompileShader(fragShader);
+			// Check vertex shader
+			glGetShaderiv(vertShader, GL_COMPILE_STATUS, &result);
+			glGetShaderiv(vertShader, GL_INFO_LOG_LENGTH, &logLength);
+			std::vector<char> vertShaderError((logLength > 1) ? logLength : 1);
+			glGetShaderInfoLog(vertShader, logLength, NULL, &vertShaderError[0]);
+			std::cout << &vertShaderError[0] << "\n";
 
-		// Check fragment shader
-		glGetShaderiv(fragShader, GL_COMPILE_STATUS, &result);
-		glGetShaderiv(fragShader, GL_INFO_LOG_LENGTH, &logLength);
-		std::vector<char> fragShaderError((logLength > 1) ? logLength : 1);
-		glGetShaderInfoLog(fragShader, logLength, NULL, &fragShaderError[0]);
-		std::cout << &fragShaderError[0] << "\n";
+			// Compile fragment shader
+			std::cout << "Compiling fragment shader.\n";
+			glShaderSource(fragShader, 1, &fragShaderSrc, NULL);
+			glCompileShader(fragShader);
 
-		std::cout << "Linking program.\n";
-		GLuint program = glCreateProgram();
-		glAttachShader(program, vertShader);
-		glAttachShader(program, fragShader);
+			// Check fragment shader
+			glGetShaderiv(fragShader, GL_COMPILE_STATUS, &result);
+			glGetShaderiv(fragShader, GL_INFO_LOG_LENGTH, &logLength);
+			std::vector<char> fragShaderError((logLength > 1) ? logLength : 1);
+			glGetShaderInfoLog(fragShader, logLength, NULL, &fragShaderError[0]);
+			std::cout << &fragShaderError[0] << "\n";
 
-		glLinkProgram(program);
+			std::cout << "Linking program.\n";
+			GLuint program = glCreateProgram();
+			glAttachShader(program, vertShader);
+			glAttachShader(program, fragShader);
 
-		glGetProgramiv(program, GL_LINK_STATUS, &result);
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-		std::vector<char> programError((logLength > 1) ? logLength : 1);
-		glGetProgramInfoLog(program, logLength, NULL, &programError[0]);
-		std::cout << &programError[0] << "\n";
+			glLinkProgram(program);
 
-		//glDetachShader(program, vertShader);
-		//glDetachShader(program, fragShader);
+			glGetProgramiv(program, GL_LINK_STATUS, &result);
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+			std::vector<char> programError((logLength > 1) ? logLength : 1);
+			glGetProgramInfoLog(program, logLength, NULL, &programError[0]);
+			std::cout << &programError[0] << "\n";
 
-		glDeleteShader(vertShader);
-		glDeleteShader(fragShader);
+			//glDetachShader(program, vertShader);
+			//glDetachShader(program, fragShader);
 
-		shaders.push_back(new Shader());
-		shaders[shaders.size() - 1]->Init(program);
+			glDeleteShader(vertShader);
+			glDeleteShader(fragShader);
 
-		return shaders.size() - 1;
+			shaders.push_back(new Shader());
+			shaders[shaders.size() - 1]->Init(program, vertex_name);
+
+			return shaders.size() - 1;
+		}
+		else{
+			printf("Shader already loaded, index returned.\n");
+			return GetShaderIndex(vertex_name);
+		}
 	}
 	std::string ShaderManager::ReadFile(const char *filePath){
 
@@ -129,5 +140,21 @@ namespace mor{
 
 	int ShaderManager::ShaderCount(){
 		return shaders.size();
+	}
+	bool ShaderManager::IsLoaded(std::string _name){
+		for (int i = 0; i < shaders.size(); i++){
+			if (_name == shaders[i]->name){
+				return true;
+			}
+		}
+		return false;
+	}
+	int ShaderManager::GetShaderIndex(std::string _name){
+		for (int i = 0; i < shaders.size(); i++){
+			if (_name == shaders[i]->name){
+				return i;
+			}
+		}
+		return -1;
 	}
 }

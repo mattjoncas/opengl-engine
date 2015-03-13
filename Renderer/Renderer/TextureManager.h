@@ -13,7 +13,7 @@ namespace mor{
 		static TextureManager *instance;
 		std::vector<Texture> textures;
 
-		int current;
+		int current_texture, current_normalmap;
 
 		TextureManager();
 		bool CheckLoaded(std::string _file);
@@ -25,7 +25,7 @@ namespace mor{
 		//load a texture, returns its index in vector
 		int LoadTexture(std::string _path);
 		//bind shader by its index
-		void BindTexture(int _index);
+		void BindTexture(int _index, GLenum _textureUnit);
 	};
 
 }

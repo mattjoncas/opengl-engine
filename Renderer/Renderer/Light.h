@@ -8,9 +8,9 @@ namespace mor{
 	public:
 		Light();
 		//point light
-		Light(glm::vec4 _position, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular, float _size, float _drop_rate);
+		Light(glm::vec3 _position, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular, float _size, float _drop_rate, bool cast_shadows);
 		//directional light
-		Light(glm::vec4 _direction, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular);
+		Light(glm::vec3 _direction, glm::vec4 _ambient, glm::vec4 _diffuse, glm::vec4 _specular);
 		~Light();
 
 		inline glm::vec4 Position() { return position; };

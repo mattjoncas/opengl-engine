@@ -14,8 +14,9 @@ namespace mor{
 		return shader;
 	}
 
-	void Shader::Init(GLuint _program){
+	void Shader::Init(GLuint _program, std::string _name){
 		shader = _program;
+		name = _name;
 		InitAttributes();
 	}
 
