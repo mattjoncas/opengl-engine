@@ -19,11 +19,13 @@ namespace mor{
 		inline glm::vec4 Diffuse() { return diffuse; };
 		inline glm::vec4 Specular() { return specular; };
 
-		void SetPosition(glm::vec4 _pos);
+		void SetPosition(glm::vec3 _pos);
 		void SetDirection(glm::vec4 _dir);
 		void SetAmbient(glm::vec4 _amb);
 		void SetDiffuse(glm::vec4 _diff);
 		void SetSpecular(glm::vec4 _spec);
+
+		void CastShadows(bool cast_shadows);
 
 		inline bool ToggleOn(){
 			if (isOn){

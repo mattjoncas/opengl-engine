@@ -34,8 +34,8 @@ namespace mor{
 
 	}
 
-	void Light::SetPosition(glm::vec4 _pos){
-		position = _pos;
+	void Light::SetPosition(glm::vec3 _pos){
+		position = glm::vec4(_pos, position.w);
 
 		update_ubo = true;
 	}
@@ -57,6 +57,15 @@ namespace mor{
 	void Light::SetSpecular(glm::vec4 _spec){
 		specular = _spec;
 
+		update_ubo = true;
+	}
+	void Light::CastShadows(bool cast_shadows){
+		if (cast_shadows){
+			position.w = 1.0f;
+		}
+		else{
+			position.w = 0.0f;
+		}
 		update_ubo = true;
 	}
 

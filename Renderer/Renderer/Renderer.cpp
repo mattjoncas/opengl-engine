@@ -1,17 +1,7 @@
 #include "Renderer.h"
 
 namespace mor{
-
-	//shader manager singleton, used to load&bind all shaders
-	ShaderManager sManager = ShaderManager::GetInstance();
-	//texture manager singleton, used to load&bind all textures
-	TextureManager tManager = TextureManager::GetInstance();
-	//model manager
-	ModelManager mManager = ModelManager::GetInstance();
-	//material manager
-	MaterialManager matManager = MaterialManager::GetInstance();
-	//light manager
-	LightManager lManager = LightManager::GetInstance();
+	Renderer* Renderer::instance = nullptr;
 
 	//light data [need to add these light props to a light class]
 	glm::vec4 light_position(10.0, 2.0, 10.0, 0.0);
@@ -59,8 +49,19 @@ namespace mor{
 
 	Renderer::~Renderer(){
 		glDeleteVertexArrays(1, &vao);
-		delete(shadowMapFBO);
-		delete(cubeMapFBO);
+		delete shadowMapFBO;
+		delete cubeMapFBO;
+	}
+	
+	Renderer& Renderer::GetInstance(){
+		if (instance == nullptr){
+			instance = new Renderer();
+		}
+		return *instance;
+	}
+	void Renderer::ResetInstance(){
+		delete instance;
+		instance = nullptr;
 	}
 
 	void Renderer::Render(GameObject* _object){
@@ -70,7 +71,6 @@ namespace mor{
 			_object->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
 			if (camera->InFrustum(_object->GetModelMatrix())){
 				BindObject(_object);
-				//update shader model uniform
 				glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_object->GetModelMatrix()));
 				glUniformMatrix3fv(sManager.GetNormalUniformL(), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(_object->GetModelMatrix())))));
 
@@ -81,37 +81,25 @@ namespace mor{
 	}
 	void Renderer::Render(std::vector<GameObject*> _objects){
 		glBindVertexArray(vao);
-		//render each object
 		for (int i = 0; i < _objects.size(); i++){
 			if (_objects[i]->IsActive()){
 				glm::mat4x4 _modelMatrix = _objects[i]->GetModelMatrix();
-				//update sphere with parent rot/pos
 				_objects[i]->bounding_shape->SetCenter(glm::vec3(_modelMatrix[3][0], _modelMatrix[3][1], _modelMatrix[3][2]));
 				if (camera->InFrustum(_objects[i]->bounding_shape)){
 					BindObject(_objects[i]);
 					glUniformMatrix4fv(sManager.GetModelUniformL(), 1, GL_FALSE, glm::value_ptr(_modelMatrix));
 					glUniformMatrix3fv(sManager.GetNormalUniformL(), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(_modelMatrix)))));
-					//draw with only triangles
 					glDrawElements(GL_TRIANGLES, mManager.GetCount(_objects[i]->model), GL_UNSIGNED_INT, 0 * sizeof(GLuint));
-					/*
-					//go through ebo faces
-					std::vector<int> c = mManager.GetVertCount(_objects[i]->model);
-					int done = 0;
-					int face = 0;
-					while (done < mManager.GetCount(_objects[i]->model)){
-					glDrawElements(GL_TRIANGLE_FAN, c[face], GL_UNSIGNED_INT, (void*)(done * sizeof(GLuint)));
-					done += c[face];
-					face++;
-					}*/
+					
 					if (debug){
 						//render wireframe
 						glm::mat4x4 wire_modelM;
 						wire_modelM = glm::translate(wire_modelM, _objects[i]->bounding_shape->Center());
-						//bounding sphere
+						
 						if (Sphere * s = dynamic_cast<Sphere*>(_objects[i]->bounding_shape)) {
 							wire_modelM = glm::scale(wire_modelM, glm::vec3(s->Radius() * 2, s->Radius() * 2, s->Radius() * 2));
 							mManager.BindModel(0);
-						}//bounding box
+						}
 						else if (AABox * b = dynamic_cast<AABox*>(_objects[i]->bounding_shape)) {
 							wire_modelM = glm::scale(wire_modelM, glm::vec3(b->Width(), b->Height(), b->Length()));
 							mManager.BindModel(1);
@@ -130,15 +118,14 @@ namespace mor{
 	void Renderer::Update(float _delta){
 		if (camera != nullptr){
 			sManager.BindShader(0);
-			//update main camera
+			
 			camera->Update(_delta);
-			//update camera ubo
+			
 			glBindBuffer(GL_UNIFORM_BUFFER, camera_ubo);
 			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera->GetView()));
 			glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 2, sizeof(glm::vec4), glm::value_ptr(camera->pos));
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
-		//update light data if need be
 		lManager.UpdateUniforms(lighting_ubo);
 
 	}
@@ -146,18 +133,15 @@ namespace mor{
 	void Renderer::SetCamera(Camera *_camera){
 		camera = _camera;
 		glBindBuffer(GL_UNIFORM_BUFFER, camera_ubo);
-		//view
+
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera->GetView()));
-		//proj
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->GetProj()));
-		//camera pos
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 2, sizeof(glm::vec4), glm::value_ptr(camera->pos));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 	void Renderer::AddLight(Light *_light){
 		lManager.AddLight(_light);
-
-		//update shader light counts
+		
 		for (int i = 0; i < sManager.ShaderCount(); i++){
 			sManager.BindShader(i);
 			glUniform1i(sManager.GetNumLightsUniform(), lManager.LightCount());
@@ -165,8 +149,7 @@ namespace mor{
 	}
 	void Renderer::RemoveLight(Light *_light){
 		lManager.RemoveLight(_light);
-
-		//update shader light counts
+		
 		for (int i = 0; i < sManager.ShaderCount(); i++){
 			sManager.BindShader(i);
 			glUniform1i(sManager.GetNumLightsUniform(), lManager.LightCount());
@@ -179,18 +162,14 @@ namespace mor{
 	int Renderer::LoadShader(std::string vertex_path, std::string fragment_path){
 		int _index = sManager.LoadShader(vertex_path.c_str(), fragment_path.c_str());
 		BindShader(_index);
-
-		//link shader to camera_ubo
+		
 		GLuint _uboIndex = glGetUniformBlockIndex(sManager.GetBindedProgram(), "GlobalMatrices");
 		glUniformBlockBinding(sManager.GetBindedProgram(), _uboIndex, camera_ubo);
-		//link shader to lighting_ubo
 		GLuint _l = glGetUniformBlockIndex(sManager.GetBindedProgram(), "LightingUniforms");
 		glUniformBlockBinding(sManager.GetBindedProgram(), _l, lighting_ubo);
-		//link shader to material_ubo
 		GLuint _m = glGetUniformBlockIndex(sManager.GetBindedProgram(), "MaterialUniforms");
 		glUniformBlockBinding(sManager.GetBindedProgram(), _m, material_ubo);
-
-		//update shader light count
+		
 		glUniform1i(sManager.GetNumLightsUniform(), lManager.LightCount());
 
 		return _index;
@@ -216,8 +195,7 @@ namespace mor{
 
 	void Renderer::InitVAO(){
 		glewInit();
-
-		//generate and bind vertex array object
+		
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 	}

@@ -30,9 +30,11 @@ namespace mor{
 
 	class Renderer{
 	public:
-		Renderer();
-		Renderer(int _screenWidth, int _screenHeight);
+		static Renderer& GetInstance();
+		static void ResetInstance();
+		//Renderer();
 		~Renderer();
+
 		/*Sets the size of the view.
 		Must be set before rendering.*/
 		inline void SetScreenSize(int _screenWidth, int _screenHeight){
@@ -64,6 +66,15 @@ namespace mor{
 		void ShadowMapPass(std::vector<GameObject*> _objects);
 		void CubeMapPass(GameObject* reflect_object, std::vector<GameObject*> _objects);
 	private:
+		static Renderer *instance;
+		Renderer();
+
+		ShaderManager sManager = ShaderManager::GetInstance();
+		TextureManager tManager = TextureManager::GetInstance();
+		ModelManager mManager = ModelManager::GetInstance();
+		MaterialManager matManager = MaterialManager::GetInstance();
+		LightManager lManager = LightManager::GetInstance();
+
 		bool debug;
 
 		int screen_width, screen_height;
