@@ -10,6 +10,7 @@ Created to learn OpenGL rendering and some advanced rendering techniques.
 * Directional & Point lights
 * Shadow Mapping [point lights]
 * Reflective Materials [cube mapping]
+
 ###Tech Used
 * C++
 * OpenGL
