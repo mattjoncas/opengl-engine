@@ -2,7 +2,7 @@
 Very simple engine created using C++ & OpenGL. Functional but still very rough around the edges.
 Created to learn OpenGL rendering and some advanced rendering techniques.
 
-###some Features
+##some Features
 * GameObjects
 * Scene
 * Basic physics
@@ -11,7 +11,7 @@ Created to learn OpenGL rendering and some advanced rendering techniques.
 * Shadow Mapping [point lights]
 * Reflective Materials [cube mapping]
 
-###Tech Used
+##Tech Used
 * C++
 * OpenGL
 * GLSL
